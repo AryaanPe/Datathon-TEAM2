@@ -5,10 +5,10 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import StandardScaler
 import pickle
-# Assuming your dataset is stored in a CSV file named 'M!_Edited.csv'
+
 weather_data = pd.read_csv('M1_final.csv')
 
-# List of possible weather condition labels and their assigned numerical values
+
 label_mapping = {
     ' Fair / Windy ': 3, ' Fair ': 1, ' Light Rain / Windy ': 7, ' Partly Cloudy ': 2,
     ' Mostly Cloudy ': 2, ' Cloudy ': 5, ' Light Rain ': 6, ' Mostly Cloudy / Windy ': 8,
