@@ -1,3 +1,4 @@
+#RUN THIS AFTER BUILDING MODELS
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
@@ -10,6 +11,7 @@ from sklearn.metrics import accuracy_score, classification_report
 from RouteOptimization import load_data, create_graph, find_optimized_path, plot
 import ast
 import warnings
+import ServiceStatus
 
 warnings.filterwarnings("ignore")
 
@@ -98,25 +100,47 @@ def get_safety_info(dep_city, dep_time):
 def get_flight_info():
     flight_id = entry_flight_id.get()
 
-    dep_city = fl_df[fl_df['FlightID'] == flight_id]['DEP_City'].values[0]
-    dep_time = fl_df[fl_df['FlightID'] == flight_id]['Dep_Time'].values[0]
-    arr_city = fl_df[fl_df['FlightID'] == flight_id]['ARR_City'].values[0]
+    if not fl_df[fl_df['FlightID'] == flight_id].empty:
+        dep_city = fl_df[fl_df['FlightID'] == flight_id]['DEP_City'].values[0]
+        dep_time = fl_df[fl_df['FlightID'] == flight_id]['Dep_Time'].values[0]
+        arr_city = fl_df[fl_df['FlightID'] == flight_id]['ARR_City'].values[0]
+        
+        serviceStatus = predictService(flight_id)
+        label_servicing.config(text=f"Service status: {serviceStatus}")
 
-    unavailable_nodes = unsafeCities(dep_city, arr_city, dep_time, G)
-    primary_path, primary_time, alternate_path, alternate_time = find_optimized_path(G, dep_city, arr_city, unavailable_nodes)
+        unavailable_nodes = unsafeCities(dep_city, arr_city, dep_time, G)
+        primary_path, primary_time, alternate_path, alternate_time = find_optimized_path(G, dep_city, arr_city, unavailable_nodes)
 
-    label_safety.config(text=f"Safety levels at a particular time:\n{get_safety_info(dep_city, dep_time)}")
+        label_safety.config(text=f"Safety levels at a particular time:\n{get_safety_info(dep_city, dep_time)}")
 
-    label_primary_path.config(text=f"Primary path: {primary_path} (Time: {primary_time})")
+        label_primary_path.config(text=f"Primary path: {primary_path} (Time: {primary_time})")
 
-    if alternate_path:
-        label_alternate_path.config(text=f"Alternate path: {alternate_path} (Time: {alternate_time})")
-        plot_alternate_path(alternate_path)
+        if alternate_path:
+            label_alternate_path.config(text=f"Alternate path: {alternate_path} (Time: {alternate_time})")
+            plot_alternate_path(alternate_path)
+        else:
+            label_alternate_path.config(text="No alternate path needed")
     else:
-        label_alternate_path.config(text="No alternate path available")
+        label_safety.config(text="Invalid Flight ID. Please enter a valid Flight ID.")
+        label_primary_path.config(text="")
+        label_alternate_path.config(text="")
+
 
 def plot_alternate_path(path):
     plot(G, path)
+
+def predictService(flightID):
+    modelMapping = {'Airbus A319':1,'Airbus A320':2,'Boeing 777':3,'Boeing 787':4}
+    servicingData = pd.DataFrame({
+        "Days Since Servicing": [fl_df[fl_df['FlightID'] == flightID]['Days_Since_Serving'].values[0]],
+        "Warranty Status": [fl_df[fl_df['FlightID'] == flightID]['Warranty_Status'].values[0]],
+        "Days Since Purchase": [fl_df[fl_df['FlightID'] == flightID]['Days_Since_Purchase'].values[0]],
+        "Company": [modelMapping[fl_df[fl_df['FlightID'] == flightID]['Model'].values[0]]]
+    })
+
+    predictions = ServiceStatus.serviceModel.predict(servicingData)
+    serviceStatus = predictions[0]
+    return serviceStatus
 
 root = tk.Tk()
 root.title("Flight Route Information")
@@ -144,5 +168,8 @@ label_alternate_path.grid(row=3, column=0, columnspan=3, padx=10, pady=10)
 
 label_image = ttk.Label(root, text="Alternate Path Visualization:")
 label_image.grid(row=4, column=0, columnspan=3, padx=10, pady=10)
+
+label_servicing = ttk.Label(root, text="Servicing status:")
+label_servicing.grid(row=5, column=0, columnspan=3, padx=10, pady=10)
 
 root.mainloop()
