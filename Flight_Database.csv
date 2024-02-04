@@ -1,0 +1,11 @@
+FlightID,DEP_City,ARR_City,Fuel_Cap,Pass_Load,Dep_Time
+AI-266,Mumbai,Chennai,6956,221,11:26
+AI-861,Kolkata,Nagpur,6240,238,12:03
+AI-234,Lucknow,Kolkata,4111,246,20:09
+AI-867,Chandigarh,Mumbai,6172,145,16:19
+AI-338,Indore,Kolkata,6505,232,7:53
+AI-595,Jaipur,Kolkata,4630,135,20:51
+AI-803,Indore,Lucknow,4160,158,16:27
+AI-636,Kanpur,Ahmedabad,3499,170,15:10
+AI-191,Kanpur,Nagpur,3020,153,19:11
+AI-977,Hyderabad,Pune,4061,121,20:47
