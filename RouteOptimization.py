@@ -51,12 +51,21 @@ def find_optimized_path(G, start, end, unavailable_nodes=[]):
     return primary_path, primary_time, None, None
 
 
-def plot(G,path):
-  pos = nx.spring_layout(G) 
-  nx.draw(G, pos, with_labels=True, font_weight='bold', node_size=700, node_color='skyblue', font_size=8)
-  nx.draw_networkx_nodes(G, pos, nodelist=path, node_color='orange', node_size=700)
-  nx.draw_networkx_edges(G, pos, width=2, edge_color='gray')
-  plt.show()
+def plot(G, path):
+    pos = nx.spring_layout(G)
+
+    plt.figure(figsize=(10, 10))
+    
+    nx.draw_networkx_nodes(G, pos, node_size=700, node_color='skyblue', edgecolors='black', linewidths=1)
+    nx.draw_networkx_nodes(G, pos, nodelist=path, node_color='orange', node_size=700, linewidths=2)
+    nx.draw_networkx_edges(G, pos, width=2, edge_color='gray')
+    nx.draw_networkx_labels(G, pos, font_size=8, font_weight='bold')
+
+    plt.title('Flight Path', fontsize=16)
+    plt.axis('off')
+    plt.show()
+
+
 
 
 filename = 'Cities_FlightDuration_Mins.csv'
